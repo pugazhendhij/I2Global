@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Query
 from sqlalchemy.orm import Session
 from models import Note, User
 from schemas import NoteCreate, NoteOut
@@ -31,14 +31,19 @@ def create_note(payload: NoteCreate, db: Session = Depends(get_db), current_user
     db.refresh(note)
     return note
 
-@router.get("/{note_id}", response_model=NoteOut)
-def get_note(note_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
+@router.get("/get", response_model=NoteOut)
+def get_note(
+    note_id: str = Query(..., description="ID of the note to fetch"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     note = db.query(Note).filter(Note.note_id == note_id, Note.owner_id == current_user.user_id).first()
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
     return note
 
-@router.put("/{note_id}", response_model=NoteOut)
+@router.put("/update/{note_id}", response_model=NoteOut)
 def update_note(note_id: str, payload: NoteCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     note = db.query(Note).filter(Note.note_id == note_id, Note.owner_id == current_user.user_id).first()
     if not note:
@@ -50,11 +55,11 @@ def update_note(note_id: str, payload: NoteCreate, db: Session = Depends(get_db)
     db.refresh(note)
     return note
 
-@router.delete("/{note_id}")
+@router.delete("/delete/{note_id}")
 def delete_note(note_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     note = db.query(Note).filter(Note.note_id == note_id, Note.owner_id == current_user.user_id).first()
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
     db.delete(note)
     db.commit()
-    return {"success": True}
+    return {"success": True,"message":"Note has been deleted successfully"}
