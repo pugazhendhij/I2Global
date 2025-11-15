@@ -19,6 +19,7 @@ class User(Base):
 
     notes = relationship("Note", back_populates="owner")
 
+
 class Note(Base):
     __tablename__ = "notes"
 
@@ -30,3 +31,5 @@ class Note(Base):
     owner_id = Column(String(36), ForeignKey("users.user_id"))
 
     owner = relationship("User", back_populates="notes")
+
+#
