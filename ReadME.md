@@ -8,3 +8,4 @@
 * Run FastAPI app: `uvicorn main:app --reload`
 * Access API at http://127.0.0.1:8000/
 * Add venv/ to .gitignore to avoid committing virtual environment
+* yhhsdahfvhks
